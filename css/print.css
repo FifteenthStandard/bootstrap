@@ -1,0 +1,16 @@
+@page {
+  size: A5 portrait;
+  @top-left   { content: ''; }
+  @top-right  { content: ''; }
+  @bottom-left   { content: ''; }
+  @bottom-right  { content: ''; }
+}
+
+@page :left { @bottom-left { content: counter(page); } }
+@page :right { @bottom-right { content: counter(page); } }
+
+body { font-size: 14px; }
+section + section { break-before: page; }
+a { text-decoration: none; color: inherit }
+figure { break-inside: avoid; }
+footer { display: none; }

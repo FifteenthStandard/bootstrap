@@ -1,0 +1,10 @@
+body {
+  font-size: 20px;
+  width: 80ch;
+  max-width: calc(100% - 2ch);
+  margin-inline: auto;
+}
+
+a { text-decoration: none; color: inherit }
+a:hover { text-decoration: underline; color: inherit }
+@media (prefers-color-scheme: dark) { figure img { filter: invert(100%); } }

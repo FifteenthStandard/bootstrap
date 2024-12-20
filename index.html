@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>Bootstrap</title>
+  <link rel="stylesheet" href="css/shared.css">
+  <link rel="stylesheet" href="css/screen.css" media="screen">
+  <link rel="stylesheet" href="css/print.css" media="print">
+</head>
+
+<body>
+<header>
+  <h1>Bootstrap</h1>
+</header>
+
+<main>
+<section id="c00">
+  <p>
+    When I was about ten, I was first introduced to computer programming via a
+    program called Game Maker, which does what it says on the tin. After making
+    a few simple games, I was struck with a question that left me perplexed for
+    years:
+  </p>
+  <blockquote>
+    <p>
+      If I need to use a program to make other programs, how was the first
+      program made?
+    </p>
+  </blockquote>
+  <p>
+    Most compilers for common programming languages are written in the language
+    which they compile. The text editors that we use to write programs are
+    themselves programs with source code which was written with a text editor.
+    These programs execute thanks to an operating system, which itself is yet
+    another program, built with a compiler, written in a text editor, running
+    on an operating system. The physical hardware of a computer is so complex
+    that it is designed with a program and manufactured by machinery, both
+    running thanks to other computers.
+  </p>
+  <p>
+    The dependencies between all these layers form intricate cycles with no
+    obvious starting point, but at some point, there must have been a first.
+    The first compiler written without a compiler. The first text editor
+    written without a text editor. The first operating system written without
+    an operating system. The first computer built without a computer.
+  </p>
+  <p>
+    This process is called <em>bootstrapping</em>, and the goal of this guide
+    is to understand how it works.
+  </p>
+  <p>
+    Rather than building each layer of this stack individually in its entirety
+    before moving up to the next layer, we will instead develop them in small
+    iterative steps, frequently moving up and down the layers. This will
+    mimic the way that hardware and software advances were made throughout
+    history and show that there are many ways to implement most functions of a
+    computer, highlighting the advantages that different implementations have.
+  </p>
+  <p>
+    We will start the journey with the electron and basic electrical circuits,
+    with components like voltage sources, resistors, inductors, capacitors, and
+    transistors. We&rsquo;ll learn how these components can be combined to make
+    other, more useful components called logic gates, which let us control the
+    flow of current through the circuit in more sophisticated ways. With enough
+    of these components, we get our hardware layer&mdash;a fairly basic 16-bit
+    computer with 64KiB of RAM, a further 64KiB of storage, a 640&Cross;480
+    pixel monochrome display, and a keyboard, as well as some other devices
+    that will be useful for manual data entry like a keypunch and punched card
+    reader.
+  </p>
+  <p>
+    To allow us to run different programs on our computer, like a text editor,
+    a compiler, and any other programs we write, as well as to provide our
+    programs with useful functionality like displaying text on the screen and
+    reading and writing files to storage, we will create an operating system.
+    Since we won&rsquo;t have a text editor or a compiler when we start
+    developing our operating system, we will have to start developing it in raw
+    machine code using a keypunch, as that requires no software to run. We can
+    then build up enough functionality to allow us to develop more useful tools
+    for developing the operating system itself, like an assembler, which
+    translates human-readable assembly language into the binary machine code
+    stored in our computer.
+  </p>
+  <p>
+    As our operating system gets more capable, we can use it to run our text
+    editor and compiler, which we will use to&hellip; develop our text editor
+    and compiler. These will both start out with an extremely limited set of
+    functionalities&mdash;whatever we were able to implement by hand&mdash;and
+    will grow rapidly as we add more features to make them powerful enough to
+    add yet more features until finally, they are fully self-contained. This
+    means our compiler will need to support reading its own source code from a
+    text file, processing the text, translating it into machine instructions,
+    and creating a binary file which can be executed by the computer.
+  </p>
+</section>
+
+<section id="c01">
+  <h2><a href="#c01">Let there be light</a></h2>
+  <p>
+    We&rsquo;re going to start at the very bottom: electricity and the
+    fundamental laws of electrical circuits. This is an entire field of study
+    in itself and we will very quickly move up one layer of abstraction so that
+    we don&rsquo;t really need to think too much about this, but I think
+    it&rsquo;s worth at least trying to understand how things work at this
+    level, so this is where we&rsquo;ll start. We&rsquo;ll explore some
+    important concepts by building an electrical circuit together, adding
+    components one at a time and explaining what they do, how they work, and
+    why they are required, as we go.
+  </p>
+  <p>
+    The starting point for our circuit is a 9V battery with its two terminals
+    connected by a piece of copper wire. In terms of function, this is an
+    extremely boring circuit&mdash;about the only thing it will do is drain the
+    battery, heat it up, and destroy it, so please don&rsquo;t do
+    this&mdash;but already it suggests some interesting questions whose answers
+    explain the fundamentals of electricity. What is a battery? What do its two
+    terminals do? Why will it drain the battery? Drain it of what exactly? Why
+    a copper wire? Let&rsquo;s dive in.
+  </p>
+  <figure>
+    <img src="imgs/c01/battery.png">
+    <figcaption>
+      A 9V battery with its two terminals connected (left), and simplified as a
+      circuit diagram (right)
+    </figcaption>
+  </figure>
+  <p>
+    Electromagnetism is one of the fundamental forces of nature and is what
+    causes electrons and protons to be attracted to each other, electrons to
+    repel other electrons and likewise protons to repel other protons.
+    Electrons and protons are called charge carriers, and we arbitrarily call
+    protons positive charge carriers and electrons negative charge carriers. In
+    their default state, atoms of any pure element have the same number of
+    protons as electrons and are neutrally charged. Although protons are
+    trapped within the nucleus of an atom, electrons orbit around the nucleus
+    at various distances and can escape their orbit and move to neighbouring
+    atoms. When an atom loses an electron, it will have more protons than
+    electrons and so become positively charged&mdash;it will be more attractive
+    to wandering electrons than a neutrally charged atom. Conversely, the atom
+    which gained an electron becomes negatively charged&mdash;it will be less
+    attractive to wandering electrons than a neutrally charged atom. When many
+    similarly charged atoms build up close together, we call this a build-up of
+    electrical charge.
+  </p>
+  <p>
+    A battery is something which purposely creates a build-up of positive and
+    negative charge. Within the battery there is a chemical reaction called
+    oxidation which causes electrons to be released from some atoms, creating a
+    steady source of free electrons at one of its terminals, which we call the
+    negative terminal or anode. There is another chemical reaction called
+    reduction which absorbs free electrons, creating a steady consumer of free
+    electrons at its other terminal, called the positive terminal or cathode.
+    The difference in charge between these two terminals creates electrical
+    potential which we call <em>voltage</em> or voltage differential. Because a
+    battery creates voltage, we call it a voltage source. When the terminals
+    are connected, electrons are pushed out of the anode, through the circuit,
+    and attracted back into the cathode, where another chemical process
+    transfers electrons back to the anode to complete the cycle. This flow of
+    electrons is called <em>current</em>. Although the electrons flow from the
+    negative terminal to the positive, for historical reasons current is
+    defined as flowing from positive to negative.
+  </p>
+  <p>
+    The specifics of these chemical reactions vary depending on the type of
+    battery, and other voltage sources like a power outlet connected to mains
+    electricity use completely different mechanisms for creating voltage
+    differences, so we won&rsquo;t go any deeper into these. The important
+    thing is that a voltage source has two terminals, one a source of electrons
+    and the other a consumer of electrons, and the difference in charge between
+    these two terminals creates a difference in electrical potential which can
+    drive current through a circuit. Since voltage differences must always be
+    measured between two points, by convention one of these points is usually
+    the negative terminal of the battery. Since the negative terminal has no
+    voltage difference with itself, we define it to be zero volts (0V), and we
+    often refer to this as <em>ground</em>.
+  <p>
+    When we connect the two terminals together to form a loop, we create a
+    <em>closed</em> electrical circuit through which current can flow (if there
+    are no continuous loops connecting the two terminals, we call it an
+    <em>open</em> circuit and current won&rsquo;t flow). The amount of current
+    depends on the conductivity, or conversely on the resistance, of the
+    material in the circuit. In our example, we used copper wire. Copper is a
+    particularly good conductor of electricity, which means that it provides
+    little resistance. The reason copper is so good at conducting electricity
+    is that one of the electrons within an atom of copper orbits the nucleus at
+    such a great (relative) distance that the attractive force is very weak,
+    the electron is said to be loosely bound to the nucleus, and can escape to
+    neighbouring copper atoms. Because of this, we call copper a conductor.
+    Other materials, like some carbon compounds, have pockets with loosely
+    bound free electrons as well as pockets with no free electrons, making it
+    harder for electrons to pass through the material as quickly. We call these
+    materials resistors. Others, like glass, have very tightly bound electrons
+    which make it almost impossible for free electrons to pass, and are called
+    insulators.
+  </p>
+  <p>
+    One common analogy for all of this is to think about water flowing through
+    pipes. There are a few caveats we need to be careful with, but overall,
+    this is a useful mental model. The first thing to note is that we should
+    only imagine water which flows through pipes at pressure, like the supply
+    pipes which carry mains pressure water from the street to your taps,
+    shower, and other fixtures. Drainpipes, which flow mostly because of
+    gravity, behave very differently from electrical circuits, so we need to
+    make sure we aren&rsquo;t picturing them in our heads.
+  </p>
+  <p>
+    Pressurised pipes work because at all times they are full of water, and you
+    can force the flow of water within the pipes by pushing water in at one end
+    with a pump of sufficient pressure, or by sucking water out at the other
+    end with a sufficient vacuum force (the opposite of pressure). Any
+    combination of these two forces creates a pressure difference which causes
+    water to flow from one end to the other. Without an infinite supply of
+    water at the inlet, the flow will stop&mdash;or similarly without an
+    infinite tank at the outlet for the water to drain into, the pressure at
+    the outlet will match the pressure at the inlet and the flow will stop. If
+    the outlet is connected back to the inlet, the water can be recycled and
+    fed back into the pipes to create a continuous flow of water.
+  </p>
+  <p>
+    When a drop of water enters at one end of a pipe, it pushes another drop
+    forward, which pushes another drop forward, and so on until a drop at the
+    other end is pushed out of the pipe back into the pump to start the cycle
+    again&mdash;or conversely when one drop leaks out at the end, its place is
+    immediately filled by a drop behind it, whose space is immediately filled
+    by another drop behind it, and so on until a drop at the start is pulled
+    into the pipe.
+  </p>
+  <p>
+    Because the pipes are always full and the flow of water is caused by this
+    push and pull of water drops, the rate of flow is the same at all points in
+    the pipe, except where there are junctions. If there are junctions, the
+    water flowing into a junction will get distributed across the branches
+    proportional to the amount of resistance of each branch&mdash;the amount of
+    water flowing into any junction is always the same as the amount of water
+    flowing out. This is true for current in a circuit too, with electrons
+    corresponding to drops of water (although electrons don&rsquo;t physically
+    bump into each other, when one moves forward it leaves a gap behind it for
+    another to fill).
+  </p>
+  <p>
+    This property, that inbound and outbound flow into a junction is always the
+    same, is called <em>Kirchhoff&rsquo;s current law</em> (KCL).
+  </p>
+  <p>
+    When water hits a bottleneck, we usually think of a build-up of water and
+    hence a build-up of pressure but recall that the pipes are already full,
+    and the water is already at pressure. Instead, the important part to
+    consider is that because the bottleneck is limiting the amount of flow,
+    there is a higher potential for flow upstream of the bottleneck than what
+    is being allowed to flow through to the downstream region, and hence the
+    pressure is proportionally lowered.
+  </p>
+  <p>
+    Within a loop of a circuit, as voltage drops through each resisting
+    section, eventually it will reach the that of ground&mdash;the negative
+    terminal of the battery or the pump that completes the loop in our pipe. If
+    the voltage did not eventually drop to ground, it would imply that the
+    there is still an excess of voltage differential in the circuit and that it
+    should be capable of driving more current, which would just drop more
+    voltage over each resistance point until eventually it stabilises to ground
+    and no more current can be driven.
+  </p>
+  <p>
+    The other way of thinking about this is to start with zero current and
+    consider what happens as the initial voltage differential from the voltage
+    source drives an increasing amount of current through the circuit. With no
+    current, there is the full differential supplied by the voltage source
+    which will start to drive current. As the current moves through the
+    circuit and crosses a resistance point, some voltage will be lost
+    based on the strength of the resistor and the amount of current that is
+    flowing, initially a small amount. This means that there will still be a
+    significant voltage differential between the last part of the circuit and
+    the negative terminal of the voltage source, which will increase the
+    current a bit more. Since the increase of incoming current needs to be
+    matched by an increase in outgoing current, current across the entire
+    circuit will increase by a small amount, which will result in a further
+    small voltage drop across every resistance point. Eventually enough voltage
+    will drop that there is no longer any difference between the last part of
+    the circuit and the negative terminal, and finally the current will
+    stabilise.
+  </p>
+  <p>
+    This property, that all components in a loop of a circuit combined will
+    drop the same amount of voltage as what is provided by the voltage source,
+    is called <em>Kirchhoff&rsquo;s voltage law</em> (KVL).
+  </p>
+  <p>
+    The rate of flow through a pipe is determined by the size of the pressure
+    differential and the size of the pipes. The pressure corresponds to voltage
+    and the size of the pipe corresponds to the conductivity of the materials
+    in the circuit&mdash;bigger pipes allow more water to flow, whereas smaller
+    pipes act like resistors and limit the amount of flow. Note that this means
+    that the <em>speed</em> of flow might not be the same at all points, but
+    the <em>rate</em> of flow will be&mdash;the volume of water moved per
+    second through any cross-section of the pipe. In areas with wider pipes, a
+    larger amount of water can flow at a lower speed and still have the same
+    rate of flow as a smaller amount of water flowing through a smaller pipe at
+    greater speed.
+  </p>
+  <p>
+    This relationship between voltage, current, and resistance is called
+    <em>Ohm&rsquo;s law</em>, and it states that
+  </p>
+  <figure>
+    <math display="block">
+      <mi>V</mi><mo>=</mo><mi>I</mi><mi>R</mi>
+    </math>
+  </figure>
+  <p>
+    where <em>V</em> is the voltage difference (in volts, V) from one side of a
+    component to the other, <em>I</em> is the amount of current flowing through
+    the component (measured in amperes or amps, A), and <em>R</em> is the
+    resistance of the component (measured in ohms, &Omega;). Note that
+    <em>V</em> is the voltage difference between each side, or said another
+    way, the voltage drop across the component, <em>not</em> the voltage
+    supplied to the &ldquo;upstream&rdquo; side of the component. The voltage
+    drop depends on the current flowing through the circuit and the resistance
+    of the component. When analysing an entire circuit, we can&rsquo;t just
+    start with the voltage available to the first component and solve for each
+    component individually in order&mdash;we need to consider how much current
+    the circuit as a whole will allow and then we can calculate how much
+    voltage will drop across each component based on its resistance.
+  </p>
+  <p>
+    This is going to sound a bit cyclical, but the total current of the circuit
+    will depend on the current permitted by each component, so we can rearrange
+    the equation to tell us the amount of current that will flow if we already
+    know the voltage and resistance,
+  </p>
+  <figure>
+    <math display="block">
+      <mi>I</mi><mo>=</mo><mfrac><mi>V</mi><mi>R</mi></mfrac>
+    </math>
+  </figure>
+  <p>
+    So how can we use these equations to analyse the behaviour of our circuit?
+    In general, this can be a tricky question to answer, but in practice there
+    are a few tricks we can use to make this straightforward. We&rsquo;ll
+    introduce these tricks as our circuit gets increasingly complex.
+  </p>
+  <p>
+    For now, our circuit only has two components: the battery and the copper
+    wire. Both have extremely small resistances&mdash;copper has about
+    0.02&Omega; and the internal resistance of a 9V battery is about 1&Omega;.
+    This means that the combined resistance in the circuit is still about
+    1&Omega; and that a 9V battery would drive about 9A of current&mdash;far
+    more than the safe level for a battery, which is typically about 200mA
+    (0.2A).
+  </p>
+  <p>
+    To make our circuit safe, we need to add a resistor to limit the amount of
+    current. We&rsquo;ll aim for 50mA (0.05A), which is about how much current
+    most useful components need to function. There is one more arrangement of
+    Ohm&rsquo;s law which can help us find a suitable resistor,
+  </p>
+  <figure>
+    <math display="block">
+      <mi>R</mi><mo>=</mo><mfrac><mi>V</mi><mi>I</mi></mfrac>
+    </math>
+  </figure>
+  <p>
+    With a 9V battery and 50mA (0.05A) of current, we would need a total
+    resistance of 180&Omega;. If we add a resistor of this size, the resistance
+    of the copper and the internal resistance of the battery become negligible
+    (less than 1% of the total resistance) so we can safely ignore them. One
+    other point worth mentioning is that in this circuit, the resistor will
+    drop the entire 9V available, so if we were to measure the voltage between
+    the wire before the resistor and ground we would get the full 9V, and
+    between the wire after the resistor and ground we get 0V.
+  </p>
+  <p>
+    Now that we have a circuit that safely draws a consistent 50mA of current,
+    we can start adding more components to it to do something useful. The first
+    such component we&rsquo;ll look at is an LED (light-emitting diode), so
+    that we can see that our circuit is doing something. But first we need to
+    understand how an LED works and what a diode is.
+  </p>
+  <figure>
+    <img src="imgs/c01/battery-resistor-diode.png">
+    <figcaption>
+      Our circuit, with voltage supply on the left, and resistor and diode on the
+      right
+    </figcaption>
+  </figure>
+  <p>
+    A diode is a component which only allows current to flow in a single
+    direction and requires a certain amount of voltage to allow any current at
+    all. How does this work? Diodes are made of materials called
+    <em>semiconductors</em>, which behave somewhere between a conductor and an
+    insulator, the most common such material being silicon. Pure silicon is a
+    weak conductor, but when a tiny amount of impurity is introduced, by the
+    addition of a few atoms of another material, its conductive properties
+    change.
+  </p>
+  <p>
+    Silicon has four electrons in its <em>valence band</em>, the part of the
+    atom which bonds it together with neighbouring atoms. Phosphorous is very
+    similar to silicon but has one extra electron in its valence band, so when
+    a trace amount of phosphorous is added to a pure silicon crystal, four of
+    the electrons in its valence band bind it with neighbouring silicon atoms,
+    and one of them becomes a free electron which can roam around and conduct a
+    small electrical current. Conversely, boron is similar to silicon but in
+    the opposite way&mdash;it has one fewer electron in its valence band, and
+    behaves a little like a silicon atom with a hole in it, which nearby
+    free electrons might jump into, leaving behind a hole that other free
+    electrons might jump into, hence conducting electrical current. Note that
+    in both cases, the individual atoms still have the same number of protons
+    and electrons&mdash;they are not naturally charged one way or the other,
+    the movement is purely random.
+  </p>
+  <p>
+    When you join two silicon crystals with these slight impurities in them,
+    one with some phosphorous and one with some boron, something interesting
+    happens. At the junction of the two pieces, the free electrons in the
+    phosphorous-infused silicon are attracted to the holes in the boron-infused
+    silicon, creating something called a <em>depletion region</em>. Within the
+    depletion region, all the free electrons from the phosphorous atoms have
+    found a free hole in the boron atoms, and so there are no more free
+    electrons and no more holes moving around to conduct electricity&mdash;the
+    depletion region acts like an insulator. Within the phosphorous side of the
+    depletion region, there are fewer electrons than protons, since some of
+    them escaped into the boron, so a small positive charge builds up.
+  </p>
+  <p>
+    Because the phosphorous is providing the free electrons, we call
+    phosphorous-infused silicon an <em>n-type</em> material (for negative).
+    Similarly, in the boron side of the depletion region, there are more
+    electrons than protons, because of the electrons which were attracted from
+    the phosphorous on the other side of the junction, so a small negative
+    charge builds up. Because the boron is providing the holes for the
+    electrons to move into, we call boron-infused silicon a <em>p-type</em>
+    material (for positive). When the voltage difference between the two sides
+    is zero, we call this <em>zero biasing</em>.
+  </p>
+  <p>
+    It gets more interesting when you apply a voltage differential to each
+    side of the combined crystal. If you apply a higher voltage to the p-type
+    side than to the n-type side, electrons will flow through the n-type
+    material until they reach the depletion region, which is positively charged
+    and will attract the electrons. Similarly on the other side, free electrons
+    in the p-type material will be attracted to the voltage source, causing a
+    migration of electrons through the material all the way back to its side of
+    the depletion region, which is negatively charged and has an excess of
+    electrons. These combined forces will shrink the depletion region to the
+    point that electrons coming in from the n-type material can cross over to
+    the p-type material, and the crystal will conduct current. We call this
+    <em>forward biasing</em>.
+  </p>
+  <p>
+    If you do the opposite&mdash;apply a higher voltage to the n-type side than
+    to the p-type side&mdash;the opposite will happen. Electrons in the n-type
+    material will be attracted out of the crystal to the voltage source,
+    creating an even stronger positive charge in the n-type material, and
+    electrons entering the p-type material will be repelled by the existing
+    negative charge in the depletion region, creating an even stronger negative
+    charge. The depletion region will only get bigger, creating an even
+    stronger insulator, and preventing any current from flowing. We call this
+    <em>reverse biasing</em>.
+  </p>
+  <figure>
+    <img src="imgs/c01/diode.png">
+    <figcaption>
+      A diode subjected to different voltage differentials
+    </figcaption>
+  </figure>
+  <p>
+    Above are four depictions of a diode. In the top-left is a diode
+    immediately at the point that the p-type and n-type material are joined
+    together. Some free electrons in the n-type material can jump across the
+    junction to holes in the p-type material. In the top-right, once this
+    electron movement has taken place, we can see the depletion region in the
+    middle. Applying the same voltage to both sides (by connecting them
+    together) leaves the depletion region intact. In the bottom-left, applying
+    high voltage to the p-type material and low voltage to the n-type material
+    shrinks the depletion region and allows current to flow. In the
+    bottom-right, applying low voltage to the p-type material and high voltage
+    to the n-type material expands the depletion region, further preventing
+    current.
+  </p>
+  <p>
+    There are two important properties that come from this behaviour, which we
+    alluded to earlier. First, that diodes will only conduct current in one
+    direction and not the other. Most materials will conduct electricity in
+    any direction, depending on which side has the higher voltage&mdash;current
+    will always flow from areas of high voltage to areas of low voltage, much
+    like how water can flow through a pipe in either direction but will always
+    flow from areas of high pressure to areas of low pressure. Diodes can be
+    used to control how current flows through a circuit by limiting direction.
+  </p>
+  <p>
+    Second, diodes don&rsquo;t have constant resistance. When a low voltage is
+    applied to the p-type side, the depletion region remains intact and no
+    current will flow, which gives the component a high effective resistance.
+    Once a certain amount of voltage is applied (called the <em>forward
+    voltage</em>), the depletion region will shrink and allow current to flow.
+    In this state, the silicon crystal is extremely conductive, providing
+    little resistance to current. This means that a diode will drop little
+    voltage beyond its forward voltage, since voltage drop is proportional to
+    resistance. This also means that when we are analysing the behaviour of a
+    circuit, we won&rsquo;t apply Ohm&rsquo;s law when determining the voltage
+    drop across a diode&mdash;its resistance is not constant, its usually
+    unknown, and not really worth trying to calculate since we know that the
+    diode will just drop its forward current and essentially nothing else
+    anyway.
+  </p>
+  <p>
+    Getting back to our circuit, if we want to add an LED there are a few
+    attributes we need to know: its forward voltage and its preferred current.
+    LEDs get brighter as much current flows through them, up to a preferred
+    maximum current where they operate at full brightness. A small amount of
+    current above this is merely wasteful, a large current above this could
+    damage the LED, so it&rsquo;s best to stick to the preferred current. A
+    typical red LED has a forward voltage of 2V and a preferred current of
+    20mA. With these details, we can add an LED to our circuit and adjust our
+    resistor to suit. With 9V available and 2V which we expect to drop across
+    our LED, we need a resistor which will allow 20mA of current and drop 7V in
+    the process. Using Ohm&rsquo;s law, we get
+    <math>
+      <mfrac>
+        <mrow><mn>7</mn><mi>V</mi></mrow>
+        <mrow><mn>0.02</mn><mi>A</mi></mrow>
+      </mfrac>
+      <mo>=</mo>
+      <mn>350</mn><mi>&Omega;</mi>
+    </math>.
+  </p>
+  <p>
+    So where do we put the LED, before the resistor or after? In this case, it
+    doesn&rsquo;t matter. Although the resistor limits current, recall that the
+    current will be the same at all points in our circuit, so even a
+    current-limiting resistor after our LED will be safe. Since it
+    doesn&rsquo;t matter where the LED goes, we will arbitrarily decide to
+    place the resistor before the LED so that it&rsquo;s easier to read a
+    circuit diagram in order and immediately know that the LED is protected.
+  </p>
+  <p>
+    While we&rsquo;re at it, we can also easily calculate the voltage to ground
+    at various points across our circuit. If we put the LED before the
+    resistor, the wire before the LED will be at 9V, the LED will then drop 2V,
+    the wire between the LED and the resistor will therefore be at 7V, the
+    resistor will drop a further 7V, and the wire after the resistor will be at
+    0V. If we had instead put the LED after the resistor, the wire between the
+    resistor and the LED would be at 2V since it comes after the 7V drop of the
+    resistor and before the 2V drop of the LED.
+  </p>
+  <p>
+    So, there we have our first basic somewhat-useful circuit. We&rsquo;ve had
+    to explore quite a lot about the basics of electricity to get here, so
+    hopefully at least some of it made sense. Some of what we discussed
+    wasn&rsquo;t relevant for our circuit, so we&rsquo;ll cover it again as we
+    continue to add more components to our circuit, and they become more
+    important and clearer by example.
+  </p>
+  <p>
+    The main takeaways from this chapter are that a circuit will drive as much
+    current as it can, limited by the resistance of its components, some of
+    which (like resistors) have a fixed amount of resistance and others (like
+    diodes) have voltage-dependent resistance. Through each junction in a
+    circuit, the current flowing in will perfectly balance with the current
+    flowing out, and through each closed loop in a circuit, the voltage dropped
+    across each component will perfectly balance with what is provided by the
+    voltage supply.
+  </p>
+</section>
+</main>
+</body>
+
+</html>
