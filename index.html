@@ -565,6 +565,159 @@
     voltage supply.
   </p>
 </section>
+
+<section id="c02">
+  <h2><a href="#c02">A fork in the road</a></h2>
+  <p>
+    One LED isn&rsquo;t going to be helpful&mdash;if we want to build a
+    computer, we&rsquo;ll eventually need a lot more of them, so we need to
+    learn more about how multiple LEDs behave within the same circuit.
+    Let&rsquo;s start by adding one more to our circuit and see what happens.
+  </p>
+  <p>
+    The simplest way to add another LED to our circuit is to just add it
+    immediately after our current LED, so let&rsquo;s analyse how this circuit
+    will behave and adjust our resistor to allow both LEDs to light up while
+    keeping total current to safe levels. So as a quick refresher, our circuit
+    now has a 9V battery connected to a resistor of some size which we&rsquo;ll
+    decide on shortly and then two LEDs, each with a forward voltage of 2V and
+    a preferred current of 20mA.
+  </p>
+  <p>
+    We know that the circuit will only be closed if both LEDs are provided with
+    2V&mdash;if either one is not, then its depletion region would prevent any
+    current from flowing through it, and since current needs to be constant
+    through our loop, if current doesn&rsquo;t flow at one point it
+    doesn&rsquo;t flow at any point. Each LED will drop 2V if it can to reach
+    its forward voltage and then provide little resistance beyond that. This
+    means that our resistor will have 5V which it can use to drive our
+    preferred 20mA of current, which means we need a
+    <math>
+      <mfrac>
+        <mrow><mn>5</mn><mi>V</mi></mrow>
+        <mrow><mn>0.02</mn><mi>A</mi></mrow>
+      </mfrac>
+      <mo>=</mo>
+      <mn>250</mn><mi>&Omega;</mi>
+    </math>
+    resistor.
+  </p>
+  <p>
+    If we keep adding more LEDs to this circuit, we can keep adjusting the size
+    of our resistor to match. Three LEDs would work with a
+    <math>
+      <mfrac>
+        <mrow><mn>3</mn><mi>V</mi></mrow>
+        <mrow><mn>0.02</mn><mi>A</mi></mrow>
+      </mfrac>
+      <mo>=</mo>
+      <mn>150</mn><mi>&Omega;</mi>
+    </math>
+    resistor. Four LEDs would work with a
+    <math>
+      <mfrac>
+        <mrow><mn>1</mn><mi>V</mi></mrow>
+        <mrow><mn>0.02</mn><mi>A</mi></mrow>
+      </mfrac>
+      <mo>=</mo>
+      <mn>50</mn><mi>&Omega;</mi>
+    </math>
+    resistor. But what if we wanted five LEDs? This would require at least 10V
+    just for the LEDs, which is more than is supplied by our battery. Does this
+    mean we need to use a bigger battery to turn on five LEDs? Or just more
+    batteries? Even a basic screen with 100&Cross;100 LEDs would require
+    20,000V? Another problem with this setup is that if one of the LEDs breaks
+    and starts to prevent the flow of current, all the LEDs will turn off, not
+    just the broken one. This might sound familiar to anybody who has an old
+    set of fairy lights. There must be another way of wiring up the LEDs that
+    doesn&rsquo;t require so much voltage and that makes them more resilient to
+    faults.
+  </p>
+  <p>
+    With the technique we&rsquo;ve used so far, we have been wiring the LEDs
+    <em>in series</em>, with one after the other. The other way to do this is
+    called wiring the LEDs <em>in parallel</em>, where each is connected to the
+    same power supply in separate loops.
+  </p>
+  <figure>
+    <img src="imgs/c02/series-vs-parallel.png">
+    <figcaption>
+      Five LEDs wired in series and in parallel
+    </figcaption>
+  </figure>
+  <p>
+    How do circuits like this behave? We need to understand how to calculate
+    voltage and current when junctions are involved. The laws we described in
+    the previous chapter already account for this. Ohm&rsquo;s law,
+    <math><mi>V</mi><mo>=</mo><mi>I</mi><mi>R</mi></math>, applies to
+    components not junctions, so is not impacted. Similarly, Kirchhoff&rsquo;s
+    voltage law applies to loops within a circuit, so it also isn&rsquo;t
+    impacted by the existence of junctions. The voltage at a junction is not
+    split across the branches, it applies equally to all branches.
+    Kirchhoff&rsquo;s current law states that the current flowing into a
+    junction perfectly balances the current flowing out&mdash;this is really
+    the law about how junctions behave.
+  </p>
+  <p>
+    This means we can quite easily analyse the behaviour of the circuit using
+    the same techniques we&rsquo;ve already been using. With 9V provided to
+    each branch and 2V to be dropped by the LED on each branch, the same
+    350&Omega; resistor we have used before on each branch will allow 20mA of
+    current through that branch. For five branches of 20mA to flow, the total
+    current flowing from the battery into the first junction, and likewise from
+    the final junction into the battery, will be 100mA. If one of the LEDs
+    breaks and opens the circuit on that branch, the other branches will remain
+    closed, and the LEDs will still work.
+  </p>
+  <p>
+    So why did we use one resistor per branch instead of a shared resistor? A
+    70&Omega; resistor before the first junction would allow 100mA of current
+    to flow. But how would that current be distributed across the branches?
+    The copper wire itself has a negligible amount of resistance, as does an
+    LED receiving its full forward voltage. We can use Ohm&rsquo;s law to
+    determine the amount of current, but the equation is
+    <math><mi>I</mi><mo>=</mo><mfrac><mi>V</mi><mi>R</mi></mfrac></math>. When
+    <math><mi>R</mi></math> is close to zero, even a tiny difference in
+    resistance causes a massive change in current. If somehow all the wires and
+    LEDs had perfectly equal resistance, it&rsquo;s possible the circuit would
+    behave as we hope, but any miniscule difference in resistance will cause
+    one branch to draw a far larger proportion of current than others, which
+    could damage the LED on that branch. If we want to ensure that each branch
+    gets the desired amount of current, adding a more substantial resistor to
+    each branch ensures that any natural variation in resistance within the
+    components is drowned out by the strength of the resistor.
+  </p>
+  <p>
+    Another benefit we get by using a separate resistor on each branch is that
+    we can change the current on each branch independently of other branches.
+    Not all components have the same preferred current. For example, a buzzer
+    which emits a beeping sound when you pass current through it might have a
+    different preferred current than an LED. On top of this, some components
+    behave differently depending on the amount of current they&rsquo;re
+    provided. If an LED receives less than its preferred current, it will glow
+    less brightly (in practice, the brightness of an LED is typically
+    controlled by pulsing it on and off at full brightness so quickly that it
+    appears to the human eye to be dimmer, but we haven&rsquo;t learnt any
+    techniques for doing this just yet).
+  </p>
+  <p>
+    If we wire LEDs in series, we must provide each LED with the same amount of
+    current, because current will be constant without any junctions. If we want
+    to change the brightness of LEDs independently, we need to wire them in
+    parallel. Let&rsquo;s say we have our same five LEDs, but we want one of
+    them to be much dimmer. We could do this by increasing the strength of the
+    resistor on its branch, say up to 1,400&Omega;, which would allow only 5mA
+    to flow through just that one branch, without impacting the other branches
+    or LEDs.
+  </p>
+  <p>
+    By wiring components in parallel rather than in sequence, we can build
+    larger circuits with more components, our circuits become more tolerant of
+    faults in some of their components, and we can allow different components
+    to receive different amounts of current. All these qualities allow us to
+    build much more interesting and useful circuits.
+  </p>
+</section>
 </main>
 </body>
 
